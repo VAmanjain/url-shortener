@@ -1,5 +1,7 @@
 const express = require("express");
+const path = require("path");
 const urlRoute = require("./Routes/urls");
+const staticRoute = require("./Routes/staticRouter");
 const { connectMongoose } = require("./connect");
 const URL = require("./Model/urls");
 
@@ -15,11 +17,17 @@ connectMongoose("mongodb://localhost:27017/short-url")
     console.log(err);
   });
 
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use("/url", urlRoute);
 
-app.get("/:shortID", async (req, res) => {
+app.use("/", staticRoute);
+
+app.get("/url/:shortID", async (req, res) => {
   const shortId = req.params.shortID;
   const entry = await URL.findOneAndUpdate(
     {
@@ -33,7 +41,7 @@ app.get("/:shortID", async (req, res) => {
       },
     }
   );
-  console.log("Object:", entry)
+  console.log("Object:", entry);
   if (entry) res.redirect(entry.redirectURL);
   else res.status(400).send("URL not found");
 });

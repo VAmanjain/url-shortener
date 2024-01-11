@@ -11,20 +11,21 @@ async function handleGenerateNewURL(req, res) {
     redirectURL: body.url,
     visitHistory: [],
   });
-
-  return res.json({id:shortId})
+  return res.render("home", {
+    id: shortId,
+  });
 }
 
-async function handleGetAnalytics(req, res){
+async function handleGetAnalytics(req, res) {
   const shortId = req.params.shortId;
-  const result = await URL.findOne({shortId});
+  const result = await URL.findOne({ shortId });
   return res.json({
-      totalClicks:result.visitHistory.length,
-      Analytics:result.visitHistory,
-  })
+    totalClicks: result.visitHistory.length,
+    Analytics: result.visitHistory,
+  });
 }
 
 module.exports = {
   handleGenerateNewURL,
-  handleGetAnalytics
+  handleGetAnalytics,
 };
